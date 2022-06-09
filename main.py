@@ -11,6 +11,40 @@ from selenium.common.exceptions import StaleElementReferenceException
 from selenium.common.exceptions import WebDriverException
 from art import tprint
 
+EXECUTABLE_PATH = "/home/ens-domains-availability-checker/chromedriver"
+
+
+class DomainChecker:
+    def __init__(self):
+        self.service = Service(EXECUTABLE_PATH)
+        self.driver = webdriver.Chrome(service=s)
+        self.actions = ActionChains(driver)
+        self.input_value = None
+        self.count = None
+        self.reserve_start = None
+        self.save_to = "domains.txt"
+
+    def check_availability(self):
+        availability = WebDriverWait(driver, 60).until(
+            EC.presence_of_element_located(
+                (By.XPATH, "/html[1]/body[1]/div[1]/div[1]/main[1]/div[2]/a[1]/div[1]/div[1]")
+            )
+        )
+        if availability.text == "Available":
+            with open(f"{self.save_to}", "a") as f:
+                return f.write(f"\n{input_value} - Available")
+
+    def check_expiry_date(self, expiry_input):
+        expiry_date = WebDriverWait(driver, 60).until(
+            EC.presence_of_element_located(
+                (By.XPATH, "/html[1]/body[1]/div[1]/div[1]/main[1]/div[2]/a[1]/p[1]")))
+        if f"{expiry_input}" in expiry_date.text:
+            with open(f"{self.save_to}", "a") as f:
+                return f.write(f"\n{input_value} - {expiry_date.text}")
+
+    def main(self):
+        pass
+
 
 def check_availability(file_name):
     availability = WebDriverWait(driver, 60).until(
@@ -46,7 +80,7 @@ def get_start_page(input_url):
 
 def main(file_name, start_number):
     tprint("Let's  find  domains", font="big")
-    print("Searching...")
+    tprint("Searching...")
     search = WebDriverWait(driver, 60).until(EC.presence_of_element_located(
         (By.XPATH, "/html[1]/body[1]/div[1]/header[1]/form[1]/input[1]")))
     global input_value
@@ -71,7 +105,7 @@ def main(file_name, start_number):
                 # time.sleep(1)
 
 
-s = Service('/Users/Bo/Desktop/Files/Coding/selenium/chromedriver2')
+s = Service(EXECUTABLE_PATH)
 driver = webdriver.Chrome(service=s)
 actions = ActionChains(driver)
 input_value = None
@@ -86,20 +120,20 @@ try:
     main("input_data.txt", 24908)  # Specify file to get inputs from, and line number for START VALUE in that file
 
 except TimeoutException:
-    print("TimeoutException")
+    tprint("TimeoutException")
     get_from_reserve()
     time.sleep(2)
     main("input_data.txt", reserve_start)
 
 except StaleElementReferenceException:
-    print("StaleElementReferenceException")
+    tprint("StaleElementReferenceException")
     get_from_reserve()
     time.sleep(2)
     main("input_data.txt", reserve_start)
 
-except WebDriverException:
-    print("WebDriverException")
-    s = Service('/Users/Bo/Desktop/Files/Coding/selenium/chromedriver2')
+except WebDriverException as e:
+    tprint(f"WebDriverException {e}")
+    s = Service(EXECUTABLE_PATH)
     driver = webdriver.Chrome(service=s)
     actions = ActionChains(driver)
     input_value = None
@@ -119,13 +153,11 @@ finally:
     time.sleep(2)
     main("input_data.txt", reserve_start)
 
-print("Last try...")
+tprint("Last try...")
 main("input_data.txt", reserve_start)
 
-print(f"Here we stopped: {reserve_start}")
+tprint(f"Here we stopped: {reserve_start}")
 
 
 time.sleep(5)
 driver.quit()
-
-
