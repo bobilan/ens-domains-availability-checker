@@ -1,8 +1,9 @@
+import chromedriver_autoinstaller
 import time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
@@ -11,13 +12,18 @@ from selenium.common.exceptions import StaleElementReferenceException
 from selenium.common.exceptions import WebDriverException
 from art import tprint
 
-EXECUTABLE_PATH = "/home/ens-domains-availability-checker/chromedriver"
+EXCEPTION_MSG = "Exception occurred [{}]"
+
+chromedriver_autoinstaller.install()
+chrome_options = Options()
+chrome_options.add_argument('--no-sandbox')
+chrome_options.add_argument('--headless')
+chrome_options.add_argument('--disable-dev-shm-usage')
 
 
 class DomainChecker:
     def __init__(self):
-        self.service = Service(EXECUTABLE_PATH)
-        self.driver = webdriver.Chrome(service=s)
+        self.driver = webdriver.Chrome()
         self.actions = ActionChains(driver)
         self.input_value = None
         self.count = None
@@ -80,7 +86,7 @@ def get_start_page(input_url):
 
 def main(file_name, start_number):
     tprint("Let's  find  domains", font="big")
-    tprint("Searching...")
+    print("Searching...")
     search = WebDriverWait(driver, 60).until(EC.presence_of_element_located(
         (By.XPATH, "/html[1]/body[1]/div[1]/header[1]/form[1]/input[1]")))
     global input_value
@@ -105,8 +111,7 @@ def main(file_name, start_number):
                 # time.sleep(1)
 
 
-s = Service(EXECUTABLE_PATH)
-driver = webdriver.Chrome(service=s)
+driver = webdriver.Chrome(chrome_options=chrome_options)
 actions = ActionChains(driver)
 input_value = None
 count = None
@@ -119,22 +124,21 @@ time.sleep(10)
 try:
     main("input_data.txt", 24908)  # Specify file to get inputs from, and line number for START VALUE in that file
 
-except TimeoutException:
-    tprint("TimeoutException")
+except TimeoutException as e:
+    print(EXCEPTION_MSG.format(e))
     get_from_reserve()
     time.sleep(2)
     main("input_data.txt", reserve_start)
 
-except StaleElementReferenceException:
-    tprint("StaleElementReferenceException")
+except StaleElementReferenceException as e:
+    print(EXCEPTION_MSG.format(e))
     get_from_reserve()
     time.sleep(2)
     main("input_data.txt", reserve_start)
 
 except WebDriverException as e:
-    tprint(f"WebDriverException {e}")
-    s = Service(EXECUTABLE_PATH)
-    driver = webdriver.Chrome(service=s)
+    print(EXCEPTION_MSG.format(e))
+    driver = webdriver.Chrome(chrome_options=chrome_options)
     actions = ActionChains(driver)
     input_value = None
     count = None
@@ -153,10 +157,10 @@ finally:
     time.sleep(2)
     main("input_data.txt", reserve_start)
 
-tprint("Last try...")
+print("Last try...")
 main("input_data.txt", reserve_start)
 
-tprint(f"Here we stopped: {reserve_start}")
+print(f"Here we stopped: {reserve_start}")
 
 
 time.sleep(5)
