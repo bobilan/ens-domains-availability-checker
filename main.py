@@ -13,6 +13,7 @@ from selenium.common.exceptions import WebDriverException
 from art import tprint
 
 EXCEPTION_MSG = "Exception occurred [{}]"
+EXECUTABLE_PATH = "https://app.ens.domains/search/000"
 
 chromedriver_autoinstaller.install()
 chrome_options = Options()
@@ -24,144 +25,101 @@ chrome_options.add_argument('--disable-dev-shm-usage')
 class DomainChecker:
     def __init__(self):
         self.driver = webdriver.Chrome()
-        self.actions = ActionChains(driver)
-        self.input_value = None
+        self.actions = ActionChains(self.driver)
+        self.input_value = ""
         self.count = None
-        self.reserve_start = None
+        self.reserve_start = 0
         self.save_to = "domains.txt"
+        self.get_from = "input_data.txt"
 
     def check_availability(self):
-        availability = WebDriverWait(driver, 60).until(
+        availability = WebDriverWait(self.driver, 60).until(
             EC.presence_of_element_located(
                 (By.XPATH, "/html[1]/body[1]/div[1]/div[1]/main[1]/div[2]/a[1]/div[1]/div[1]")
             )
         )
         if availability.text == "Available":
             with open(f"{self.save_to}", "a") as f:
-                return f.write(f"\n{input_value} - Available")
+                return f.write(f"\n{self.input_value} - Available")
 
     def check_expiry_date(self, expiry_input):
-        expiry_date = WebDriverWait(driver, 60).until(
+        expiry_date = WebDriverWait(self.driver, 60).until(
             EC.presence_of_element_located(
                 (By.XPATH, "/html[1]/body[1]/div[1]/div[1]/main[1]/div[2]/a[1]/p[1]")))
         if f"{expiry_input}" in expiry_date.text:
             with open(f"{self.save_to}", "a") as f:
-                return f.write(f"\n{input_value} - {expiry_date.text}")
+                return f.write(f"\n{self.input_value} - {expiry_date.text}")  # how to get input value from iteration
+    # here
 
-    def main(self):
-        pass
+    def reserve_list(self):
+        with open("reserve_list.txt", "w") as f:
+            f.write(str(self.count))
 
+    def get_from_reserve(self):
+        with open("reserve_list.txt", "r") as f:
+            self.reserve_start = int(f.read())
 
-def check_availability(file_name):
-    availability = WebDriverWait(driver, 60).until(
-        EC.presence_of_element_located((By.XPATH, "/html[1]/body[1]/div[1]/div[1]/main[1]/div[2]/a[1]/div[1]/div[1]")))
-    if availability.text == "Available":
-        with open(f"{file_name}", "a") as f:
-            return f.write(f"\n{input_value} - Available")
+    def get_start_page(self):
+        self.driver.get(f"{EXECUTABLE_PATH}")
 
+    def main(self, start_number):
+        tprint("Let's  find  domains", font="big")
+        print("Searching...")
+        search = WebDriverWait(self.driver, 60).until(EC.presence_of_element_located(
+            (By.XPATH, "/html[1]/body[1]/div[1]/header[1]/form[1]/input[1]")))
+        with open(f"{self.get_from}", "r") as names:
+            for count, self.input_value in enumerate(names):
+                if count >= start_number:
+                    self.reserve_list()
+                    self.actions.click(search).perform()
+                    self.actions.send_keys(self.input_value).perform()
+                    time.sleep(3)
 
-def check_expiry_date(expiry_input, file_name):
-    expiry_date = WebDriverWait(driver, 60).until(
-        EC.presence_of_element_located((By.XPATH, "/html[1]/body[1]/div[1]/div[1]/main[1]/div[2]/a[1]/p[1]")))
-    if f"{expiry_input}" in expiry_date.text:
-        with open(f"{file_name}", "a") as f:
-            return f.write(f"\n{input_value} - {expiry_date.text}")
+                    self.actions.send_keys(Keys.ENTER)
+                    self.actions.perform()
 
-
-def reserve_list():
-    with open("reserve_list.txt", "w") as f:
-        f.write(str(count))
-
-
-def get_from_reserve():
-    global reserve_start
-    with open("reserve_list.txt", "r") as f:
-        reserve_start = int(f.read())
-        return reserve_start
-
-
-def get_start_page(input_url):
-    driver.get(f"{input_url}")
-
-
-def main(file_name, start_number):
-    tprint("Let's  find  domains", font="big")
-    print("Searching...")
-    search = WebDriverWait(driver, 60).until(EC.presence_of_element_located(
-        (By.XPATH, "/html[1]/body[1]/div[1]/header[1]/form[1]/input[1]")))
-    global input_value
-    global count
-    with open(f"{file_name}", "r") as names:
-        for count, input_value in enumerate(names):
-            if count >= start_number:
-                reserve_list()
-                actions.click(search).perform()
-                actions.send_keys(input_value).perform()
-                time.sleep(3)
-
-                actions.send_keys(Keys.ENTER)
-                actions.perform()
-
-                if check_availability(save_to):
-                    continue
-                elif check_expiry_date("2022.06", save_to):  # Date range
-                    continue
-                elif check_expiry_date("2022.07", save_to):  # Date range
-                    continue
-                # time.sleep(1)
+                    if self.check_availability():
+                        continue
+                    elif self.check_expiry_date("2022.06"):  # Date range
+                        continue
+                    elif self.check_expiry_date("2022.07"):  # Date range
+                        continue
 
 
-driver = webdriver.Chrome(chrome_options=chrome_options)
-actions = ActionChains(driver)
-input_value = None
-count = None
-reserve_start = None
-save_to = "domains.txt"  # Specify the file to save the results to
+domain_checker = DomainChecker()
 
-get_start_page("https://app.ens.domains/search/000")
+domain_checker.get_start_page()
 time.sleep(10)
 
 try:
-    main("input_data.txt", 24908)  # Specify file to get inputs from, and line number for START VALUE in that file
+    domain_checker.main(1)  # SPECIFY START VALUE NUMBER
 
 except TimeoutException as e:
     print(EXCEPTION_MSG.format(e))
-    get_from_reserve()
+    domain_checker.get_from_reserve()
     time.sleep(2)
-    main("input_data.txt", reserve_start)
+    domain_checker.main(domain_checker.reserve_start)  # how to get to class variable???
 
 except StaleElementReferenceException as e:
     print(EXCEPTION_MSG.format(e))
-    get_from_reserve()
+    domain_checker.get_from_reserve()
     time.sleep(2)
-    main("input_data.txt", reserve_start)
+    domain_checker.main(domain_checker.reserve_start)
 
 except WebDriverException as e:
-    print(EXCEPTION_MSG.format(e))
-    driver = webdriver.Chrome(chrome_options=chrome_options)
-    actions = ActionChains(driver)
-    input_value = None
-    count = None
-    reserve_start = None
-    save_to = "domains.txt"  # Specify the file to save the results to
-
-    get_start_page("https://app.ens.domains/search/000")
-    timeout = 5
-
-    get_from_reserve()
-    time.sleep(2)
-    main("input_data.txt", reserve_start)
+    domain_checker.get_start_page()
+    time.sleep(10)
+    domain_checker.get_from_reserve()
+    domain_checker.main(domain_checker.reserve_start)
 
 finally:
-    get_from_reserve()
-    time.sleep(2)
-    main("input_data.txt", reserve_start)
+    domain_checker.get_from_reserve()
+    domain_checker.main(domain_checker.reserve_start)
 
 print("Last try...")
-main("input_data.txt", reserve_start)
-
-print(f"Here we stopped: {reserve_start}")
-
+domain_checker.get_from_reserve()
+domain_checker.main(domain_checker.reserve_start)
+print(f"Here we stopped: {domain_checker.reserve_start}")
 
 time.sleep(5)
-driver.quit()
+domain_checker.driver.quit()
