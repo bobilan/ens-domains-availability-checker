@@ -1,5 +1,6 @@
 FROM python:slim-buster
 ARG BOT_TOKEN
+ARG BOT_ID
 ARG DB_PASSWORD
 ARG DB_HOST
 ARG DB_PORT
@@ -19,6 +20,7 @@ COPY ./requirements.txt /home/ens-domain-availability-checker/requirements.txt
 
 RUN pip install --user --no-cache-dir -r /home/ens-domain-availability-checker/requirements.txt
 ENV BOT_TOKEN="$BOT_TOKEN"
+ENV BOT_ID="$BOT_ID"
 ENV DB_PASSWORD="$DB_PASSWORD"
 ENV DB_HOST="$DB_HOST"
 ENV DB_PORT="$DB_PORT"
