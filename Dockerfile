@@ -1,6 +1,9 @@
 FROM python:slim-buster
 ARG BOT_TOKEN
 ARG DB_PASSWORD
+ARG DB_HOST
+ARG DB_PORT
+ARG DB_USER
 WORKDIR /home/ens-domains-availability-checker/
 
 RUN apt-get update
@@ -17,5 +20,8 @@ COPY ./requirements.txt /home/ens-domain-availability-checker/requirements.txt
 RUN pip install --user --no-cache-dir -r /home/ens-domain-availability-checker/requirements.txt
 ENV BOT_TOKEN="$BOT_TOKEN"
 ENV DB_PASSWORD="$DB_PASSWORD"
+ENV DB_HOST="$DB_HOST"
+ENV DB_PORT="$DB_PORT"
+ENV DB_USER="$DB_USER"
 ENV PYTHONPATH=/home/ens-domains-availability-checker/
 CMD ["python", "main.py"]
