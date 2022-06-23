@@ -36,7 +36,7 @@ chrome_options.add_argument("--disable-dev-shm-usage")
 
 class DomainChecker:
     def __init__(self):
-        self.driver = webdriver.Chrome()
+        self.driver = webdriver.Chrome(options=chrome_options)
         self.actions = ActionChains(self.driver)
         self.input_value = ""
         self.count = 0
