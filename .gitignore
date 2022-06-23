@@ -7,3 +7,6 @@ venv-new
 .idea/vcs.xml
 .idea/jsLibraryMappings.xml
 *.iml
+.database.ini
+__pycache__/
+.DS_Store

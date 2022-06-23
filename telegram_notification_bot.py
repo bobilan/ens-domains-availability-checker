@@ -1,10 +1,9 @@
 import os
-
 import telegram
 
 BOT_TOKEN = os.environ["BOT_TOKEN"]
 bot = telegram.Bot(token=BOT_TOKEN)
-NOTIFICATIONS_CHANNEL_ID = ""
+NOTIFICATIONS_CHANNEL_ID = "-1001696527390"
 
 
 def send_message_to_channel(message: str):
