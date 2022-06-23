@@ -1,0 +1,7 @@
+selenium
+art
+python-telegram-bot==13.11
+chromedriver-autoinstaller
+psycopg2
+python-dateutil
+datetime
