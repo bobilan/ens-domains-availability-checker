@@ -59,7 +59,7 @@ class DomainChecker:
             insert_available(self.input_value, AVAILABLE_STATUS)
 
     @staticmethod
-    def regex_get_date_(self, text):
+    def regex_get_date_(text):
         match = re.findall(r"\d\d\d\d\.\d\d.\d\d", text)
         return match[0]
 

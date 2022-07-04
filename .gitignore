@@ -9,3 +9,4 @@ venv-new
 *.iml
 __pycache__/
 .DS_Store
+write_to_d)_database.py

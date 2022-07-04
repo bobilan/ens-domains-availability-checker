@@ -25,6 +25,12 @@ def create_tables():
                 id INTEGER PRIMARY KEY
         )
         """,
+        """
+        CREATE TABLE input_data (
+                id INTEGER PRIMARY KEY,
+                inputs VARCHAR(55) 
+        )
+        """
     )
     conn = None
     try:

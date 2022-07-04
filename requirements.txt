@@ -2,6 +2,5 @@ selenium
 art
 python-telegram-bot==13.11
 chromedriver-autoinstaller
-psycopg2
+psycopg2-binary
 python-dateutil
-datetime
