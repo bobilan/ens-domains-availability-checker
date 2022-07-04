@@ -122,7 +122,7 @@ def run_with_retries():
     domain_checker = DomainChecker()
     try:
         domain_checker.get_start_page()
-        time.sleep(20)
+        time.sleep(10)
         domain_checker.main(get_from_reserve_list())
     except Exception as ex:
         print(EXCEPTION_MSG.format(ex))

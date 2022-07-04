@@ -23,7 +23,7 @@ ENV BOT_TOKEN="$BOT_TOKEN"
 ENV BOT_ID="$BOT_ID"
 ENV DB_PASSWORD="$DB_PASSWORD"
 ENV DB_HOST="$DB_HOST"
-ENV DB_PORT="$DB_PORT"
+ENV DB_PORT="$25060"
 ENV DB_USER="$DB_USER"
 ENV PYTHONPATH=/home/ens-domains-availability-checker/
 CMD ["python", "main.py"]

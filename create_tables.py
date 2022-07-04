@@ -27,7 +27,7 @@ def create_tables():
         """,
         """
         CREATE TABLE input_data (
-                id INTEGER PRIMARY KEY,
+                id BIGSERIAL PRIMARY KEY,
                 inputs VARCHAR(55) 
         )
         """
